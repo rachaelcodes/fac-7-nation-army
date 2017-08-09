@@ -1,4 +1,4 @@
-
+const path = require('path');
 const fs = require('fs');
 
 const handleHome = (request,response) =>{
@@ -16,6 +16,7 @@ const handleHome = (request,response) =>{
 }
 
 const handlePublic = (request,response) =>{
+  const fileName = request.url
   const filePath = path.join(__dirname, '..', 'public', fileName);
   const extension = fileName.split('.')[1];
   const extensionType = {
