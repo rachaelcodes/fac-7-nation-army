@@ -38,7 +38,6 @@
     "cookie-signature": "^1.0.6",
     "env2": "^2.2.0",
     "jsonwebtoken": "^7.4.2",
-    "npm": "^5.3.0",
     "pg": "^7.1.0"
   }
 }
