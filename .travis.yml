@@ -7,6 +7,10 @@ services:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
+  - pip install --user codecov
+
+after_sucess:
+  - codecov --file coverage/lcov.info --disable search
 
 env:
     - DATABASE_URL=postgres://postgres@localhost/travisdb
