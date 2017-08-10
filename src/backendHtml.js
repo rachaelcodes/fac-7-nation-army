@@ -13,7 +13,7 @@ const getPosts = (cb) => {
 
 
 const parseSQL = (data) => {
-  let replacement = '';
+  let replacement = '<section class = "display-comments">\n';
 
   data.forEach((e) => {
     replacement += '<button> \n<span>\n<img src="';
@@ -24,8 +24,10 @@ const parseSQL = (data) => {
     replacement += e.post;
     replacement += '</article>\n<p>';
     replacement += e.date;
-    replacement += '\n</p>\n</span>\n</button>';
+    replacement += '\n</p>\n</span>\n</button>\n';
   });
+
+  replacement += '</section>';
 
   return replacement;
 }
