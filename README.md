@@ -2,7 +2,7 @@
 ![Travis button](https://travis-ci.org/rachaelcodes/week7-ARMY.svg?branch=master) [![codecov](https://codecov.io/gh/rachaelcodes/fac-7-nation-army/branch/master/graph/badge.svg)](https://codecov.io/gh/rachaelcodes/fac-7-nation-army)
 
 ## What :grey_question: 
-All the silly times we FAC UP
+Ever feel like you're terrible at coding? Or that rookie mistake you just made makes you shrivel with shame? Well misery loves company. ON FAC'd Up we can share our hilarious moments of cringe worthy coding blunders and realise we are not alone!
 
 ## User Stories :snowman: 
 As a FAC'd Upper I can...
