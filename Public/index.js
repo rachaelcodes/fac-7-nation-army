@@ -8,13 +8,23 @@ var commentBox = document.getElementById('comment');
 var loginWarning = document.getElementById('loginWarning');
 var commentWarning = document.getElementById('commentWarning');
 
-function userCheck(entry, warningSign) {
+function userCheckLength(entry, warningSign) {
   if (entry.value.length === 0) {
     entry.classList.add('js-warning');
     warningSign.classList.remove('invisible');
   } else {
     entry.classList.remove('js-warning');
     warningSign.classList.add('invisible');
+  }
+}
+
+function userCheckSpace(entry) {
+  if (entry.value.indexOf(' ') === -1) {
+    entry.classList.add('js-warning');
+    passwordBox.classList.remove('invisible');
+  } else {
+    entry.classList.remove('js-warning');
+    passwordBox.classList.add('invisible');
   }
 }
 
@@ -33,7 +43,7 @@ function postRequest(data, endpoint) {
 
 loginForm.addEventListener('submit', function(e) {
   e.preventDefault();
-  if (usernameBox.value.length > 0 && passwordBox.value.length > 0) {
+  if (usernameBox.value.length > 0 && passwordBox.value.length > 0 || usernameBox.value.indexOf(' ') !== -1 || passwordBox.value.indexOf(' ')) {
     var data = {
       username: usernameBox.value,
       password: passwordBox.value
