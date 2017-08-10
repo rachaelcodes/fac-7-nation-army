@@ -27,7 +27,7 @@ const parseSQL = (data) => {
     replacement += '\n</p>\n</span>\n</button>\n';
   });
 
-  replacement += '</section>';
+  replacement += '</section>\n<!-- end of comments -->';
 
   return replacement;
 }
@@ -38,7 +38,7 @@ const replaceHTML = (replacement) => {
       return console.log(err);
     }
 
-    const result = data.replace(/<!-- display comments here -->/g, replacement);
+    const result = data.replace(/<!-- display comments here -->(\n|.)*<!-- end of comments -->/g, replacement);
 
     fs.writeFile(__dirname + "/../Public/index.html", result, 'utf8', (err) => {
       if (err) return console.log(err);
