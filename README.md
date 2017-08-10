@@ -6,20 +6,18 @@ Ever feel like you're terrible at coding? Or that rookie mistake you just made m
 
 ## User Stories :snowman: 
 As a FAC'd Upper I can...
-- [ ] log into the website
+- [x] log into the website (test logins Username: Aisha   Password: password/ Username Yahia    Password: test1)
 - [ ] add my own confession
-- [ ] view others confessions
+- [x] view others confessions
 
 ## Requirements :heavy_exclamation_mark: 
-+ [ ] Login form with 2 fields - username and password
++ [x] Login form with 2 fields - username and password
 + [ ] Client-side _and_ server-side validation on login form, including error handling that provides feedback to users
-+ [ ] Users only have to log in once (i.e. implement a cookie-based session on login)
++ [x] Users only have to log in once (i.e. implement a cookie-based session on login)
 + [ ] Username is visible on each page of the site after logging in
 + [ ] Any user-submitted content should be labelled with the authors username
 + [ ] There should be protected routes and unprotected routes that depend on the user having a cookie or not (or what level of access they have).
-+ [ ] Website content should be stored in a database
-
-## Planning: Architecture & Flow :wavy_dash: 
++ [x] Website content should be stored in a database
 
 ## Schema :1234: 
 
@@ -42,12 +40,6 @@ As a FAC'd Upper I can...
 | user_id     | Serial    | Foreign Key    | 
 | post    | VARCHAR(200)     | not null    | 
 | date     | DATE    | not null   | 
-
-## Test usernames for website
-FAC Week 7 user login project
-Test username and passwords:
-Username: Aisha   Password: password
-Username Yahia    Password: test1
 
 ## Cool Learnings :cool: 
 * [Guide to editing html from the back end](https://stackoverflow.com/questions/14177087/replace-a-string-in-a-file-with-nodejs)
