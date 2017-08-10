@@ -59,10 +59,8 @@ const replaceHTML = (replacement, regex) => {
     }
 
     const result = data.replace(regex, replacement);
-
-    fs.writeFile(__dirname + "/../Public/index.html", result, 'utf8', (err) => {
-      if (err) return console.log(err);
-    });
+    console.log(result);
+    return result;
   });
 };
 
@@ -76,11 +74,11 @@ const replaceComments = () => {
 const replaceLogin = (user) => {
   getLoginInfo(user, (error, result) => {
     if (error) return console.log(error);
-    replaceHTML(parseLoginSQL(result), /<!-- logged in header -->(\n|.)*<!-- end of logged in header -->/g);
+    return replaceHTML(parseLoginSQL(result), /<!-- logged in header -->(\n|.)*<!-- end of logged in header -->/g);
   });
 };
 
 
-replaceLogin(1);
-replaceComments();
+// replaceLogin(1);
+// replaceComments();
 module.exports = { replaceComments, replaceLogin };
