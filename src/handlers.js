@@ -1,21 +1,35 @@
+const {
+  readFile
+} = require('fs');
+const {
+  parse
+} = require('cookie');
+const {
+  sign,
+  verify
+} = require('jsonwebtoken');
 
-const fs = require('fs');
+const secret = process.env.SECRET;
+const userDetails = process.env.USERDETAILS;
+const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
 
-const handleHome = (request,response) =>{
-  fs.readFile(__dirname + "/../Public/index.html", function(error, file) {
+const handleHome = (request, response) => {
+  readFile(__dirname + "/../Public/index.html", function(error, file) {
     if (error) {
       response.writeHead(500, 'Content-Type:text/html');
       response.end('<h1>Sorry, our homepage is sleeping</h1>');
 
-    }else {
-      response.writeHead(200, {"Content-Type":"text/html"});
+    } else {
+      response.writeHead(200, {
+        "Content-Type": "text/html"
+      });
       response.end(file);
     }
   });
 
 }
 
-const handlePublic = (request,response) =>{
+const handlePublic = (request, response) => {
   const filePath = path.join(__dirname, '..', 'public', fileName);
   const extension = fileName.split('.')[1];
   const extensionType = {
@@ -25,23 +39,94 @@ const handlePublic = (request,response) =>{
     ico: 'image/x-icon',
     jpg: 'image/jpeg',
   };
-  fs.readFile(filePath, (error, file) => {
+  readFile(filePath, (error, file) => {
     if (error) {
-      response.writeHead(500, { 'Content-Type': 'text/html' });
+      response.writeHead(500, {
+        'Content-Type': 'text/html'
+      });
       response.end('Sorry, we\'ve had a problem');
     } else {
-      response.writeHead(200, { 'Content-Type': extensionType[extension] });
+      response.writeHead(200, {
+        'Content-Type': extensionType[extension]
+      });
       response.end(file);
     }
   });
 }
-const handleLogin = (request,response) =>{
+
+const handleLogin = (request, response) => {
+
+  const cookie = sign(userDetails, secret);
+  response.writeHead(302, {
+    'Location': '/',
+    'Set-Cookie: `jwt=${cookie};HttpOnly`'
+  });
+  response.end();
+  handleAuth(request, response);
+}
+
+const handleLogout = (request, response) => {
+  response.writeHead(302, {
+    'Location': '/',
+    'Set-Cookie: `jwt=0;Max-Age=0`'
+  });
+  response.end()
+}
+
+const handleAuth = (request, response) => {
+  const sendError = () => {
+    const message = 'Authenication failed!';
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+      'Content-Length': message.length
+    });
+    response.end(message);
+  }
+  if (!request.headers.cookie) return sendError();
+
+  const {
+    jwt
+  } = parse(request.headers.cookie);
+
+  if (!jwt) return sendError();
+
+  return verify(jwt, secret, (err, jwt) => {
+    if (err) {
+      return sendError();
+    } else {
+      const message = `Welcome! Your user ID is: ${jwt.userId}!`
+      response.writeHead(
+        200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': message.length
+        }
+      );
+      response.end(message)
+    }
+  })
+}
+
+const handleError = (request, response) => {
+  response.writeHead(
+    404, {
+      'Content-Type': 'text/html',
+      // What does this do?
+      'Content-Length': notFoundPage.length;
+    }
+  );
+  response.end(notFoundPage)
+}
+const handlePost = (request, response) => {
 
 }
 
-const handlePost = (request,response) =>{
 
+module.exports = {
+  handleHome,
+  handlePublic,
+  handleLogin,
+  handleLogout,
+  handleAuth,
+  handleError,
+  handlePost
 }
-
-
-module.exports = {handleHome, handlePublic, handleLogin, handlePost}
