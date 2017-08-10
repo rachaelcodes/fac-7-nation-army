@@ -48,15 +48,12 @@ const handlePublic = (request, response) => {
 const handleLogin = (request, response) => {
 
   const cookie = sign(userDetails, SECRET);
-  console.log('cookie', cookie);
   response.writeHead(302, {
     'Location': '/',
     'Set-Cookie': `jwt=${cookie};HttpOnly`
   });
 
   response.end();
-  // handleAuth(request, response);
-  console.log('hi2');
 }
 
 const handleLogout = (request, response) => {
@@ -67,20 +64,21 @@ const handleLogout = (request, response) => {
   return response.end()
 }
 
-const handleAuth = (request) => {
+const handleAuth = (request, cb) => {
 
-    if (!request.headers.cookie) return updateIndex(false);
+    if (!request.headers.cookie) return cb  (true, false,{});
 
     const {
       jwt
     } = parse(request.headers.cookie);
 
-    if (!jwt) return updateIndex(false);
+    if (!jwt) return   cb  (true, false,{})
     return verify(jwt, SECRET, (err, jwt) => {
       if (err) {
-        return updateIndex(false)
+
+        cb  (err, false,{})
       } else {
-        return updateIndex(true, {
+        cb (null, true, {
           faccer: jwt.faccer,
           avatar: jwt.avatar
         })
@@ -102,25 +100,21 @@ const handlePost = (request, response) => {
 }
 
 const handleHome = (request, response) => {
-  // readFile(__dirname + "/../Public/index.html", function(error, file) {
-  //   if (error) {
-  //     response.writeHead(500, 'Content-Type:text/html');
-  //     return response.end('<h1>Sorry, our homepage is sleeping</h1>');
-  //
-  //   } else {
-  //     console.log('hone');
-  //     response.writeHead(200, {
-  //       "Content-Type": "text/html"
-  //     });
-  //     return response.end(file);
-  //   }
-  // });
-  let htmlPage = handleAuth(request);
-  console.log('html reaches handleHome', htmlPage);
-  response.writeHead(200, {
-    "Content-Type": "text/html"
+  handleAuth(request, (err,res,obj) => {
+    if (err) {
+      updateIndex(false, obj, (err,res) => {
+
+        response.writeHead(200, 'Content-Type:text/html');
+        response.end(res);
+      })
+    }
+     else {
+      updateIndex(true,obj, (err,res)=>{
+        response.writeHead(200, 'Content-Type:text/html');
+        response.end(res);
+      })
+    }
   });
-  response.end(htmlPage);
 }
 
 

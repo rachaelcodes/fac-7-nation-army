@@ -11,7 +11,7 @@ const getPosts = (cb) => {
   });
 };
 
-const parseCommentSQL = (data) => {
+const parseCommentSQL = (data, cb) => {
   let replacement = '<!-- display comments here -->\n<section class = "display-comments">\n';
 
   data.forEach((e) => {
@@ -28,10 +28,10 @@ const parseCommentSQL = (data) => {
 
   replacement += '</section>\n<!-- end of comments -->';
 
-  return replacement;
+  cb(null,replacement);
 };
 
-const addLoginBox = () => {
+const addLoginBox = (cb) => {
   let replacement = '<!-- log in header -->\n';
     replacement +=' <header class="header">\n';
     replacement +='   <form id ="login" method="POST" action="/login">\n';
@@ -45,42 +45,52 @@ const addLoginBox = () => {
     replacement +=' </header>\n';
     replacement +='<!-- end of log in header -->';
 
-return replacement;
+cb(null,replacement);
 }
 
 
-const addUserInfo = (data) => {
+const addUserInfo = (data, cb) => {
   let replacement = '<!-- log in header -->\n<header class="header">\n<img src="';
   replacement += data.avatar;
   replacement += '" alt="Avatar"><p>Welcome ';
   replacement += data.faccer;
   replacement += '</p>\n</header>\n<!-- end of log in header -->';
 
-  return replacement;
+  cb(null, replacement);
 };
 
-const replaceHTML = (replacementLogin, replacementComments) => {
+const replaceHTML = (replacementLogin, replacementComments, cb) => {
   fs.readFile(__dirname + "/../Public/index.html", 'utf8', (err, data) => {
     if (err) {
-      return console.log(err);
+      cb(err)
+    } else {
+      let result = data.replace(/<!-- log in header -->(\n|.)*<!-- end of log in header -->/g, replacementLogin);
+      result = result.replace(/<!-- display comments here -->(\n|.)*<!-- end of comments -->/g, replacementComments);
+      cb(null, result);
     }
-
-    let result = data.replace(/<!-- log in header -->(\n|.)*<!-- end of log in header -->/g, replacementLogin);
-    result = result.replace(/<!-- display comments here -->(\n|.)*<!-- end of comments -->/g, replacementComments);
-    console.log(result);
-    return result;
   });
 };
 
 
-const updateIndex = (verify, userInfo) => {
+const updateIndex = (verify, userInfo, cb) => {
   getPosts((error, result) => {
     if (error) return console.log(error);
-    if (verify === false) {
-      // return replaceHTML(addLoginBox(), parseCommentSQL(result));
-    (replaceHTML(addLoginBox(), parseCommentSQL(result)));
+    if (!verify) {
+    parseCommentSQL(result, (err,responseParsed)=>{
+      addLoginBox((err,responseLogin)=>{
+        replaceHTML(responseLogin, responseParsed, (err,res)=>{
+          cb(null,res);
+        })
+      })
+    })
     } else {
-      return replaceHTML(addUserInfo(userInfo), parseCommentSQL(result));
+      parseCommentSQL(result, (err,responseParsed)=>{
+        addUserInfo(userInfo,(err,responseLogin)=>{
+          replaceHTML(responseLogin, responseParsed, (err,res)=>{
+            cb(null,res);
+          })
+        })
+      })
     }
   });
 };
