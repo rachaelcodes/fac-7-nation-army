@@ -27,6 +27,7 @@ const handlePublic = (request,response) =>{
     jpg: 'image/jpeg',
   };
   fs.readFile(filePath, (error, file) => {
+    console.log(filePath);
     if (error) {
       response.writeHead(500, { 'Content-Type': 'text/html' });
       response.end('Sorry, we\'ve had a problem');
