@@ -76,32 +76,42 @@ const handleLogin = (request, response) => {
         }
         getHashFromDB(username, (err,userDetails)=>{
           if (err){
-            console.log('getHashFromDB err is '+err);
+            response.writeHead(302, {
+              'Location': '/'
+            });
+          response.end();
           }
-          const dbHash = userDetails[0].password;
-          bcrypt.compare(password,dbHash,(err,pwCheck)=>{
-            if (err){
-              console.log('bcrypt.compare err is '+err);
-            }
-              if (pwCheck) {
-                const cookiePayload = {};
-                cookiePayload.id = userDetails[0].id;
-                cookiePayload.faccer = userDetails[0].faccer;
-                cookiePayload.avatar = userDetails[0].avatar;
-                console.log(userDetails);
-                const cookie = sign(cookiePayload, SECRET);
+          if (userDetails[0]){
+            const dbHash = userDetails[0].password;
+            bcrypt.compare(password,dbHash,(err,pwCheck)=>{
+              if (err){
+                console.log('bcrypt.compare err is '+err);
+              }
+                if (pwCheck) {
+                  const cookiePayload = {};
+                  cookiePayload.id = userDetails[0].id;
+                  cookiePayload.faccer = userDetails[0].faccer;
+                  cookiePayload.avatar = userDetails[0].avatar;
+                  console.log(userDetails);
+                  const cookie = sign(cookiePayload, SECRET);
+                  response.writeHead(302, {
+                    'Location': '/',
+                    'Set-Cookie': `jwt=${cookie};HttpOnly`
+                  });
+                response.end();
+              } else {
                 response.writeHead(302, {
-                  'Location': '/',
-                  'Set-Cookie': `jwt=${cookie};HttpOnly`
+                  'Location': '/'
                 });
               response.end();
-            } else {
-              response.writeHead(302, {
-                'Location': '/'
-              });
-            response.end();
-            }
-          })
+              }
+            })
+          } else {
+            response.writeHead(302, {
+              'Location': '/'
+            });
+          response.end();
+          }
         })
       })
     });
