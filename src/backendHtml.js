@@ -1,16 +1,6 @@
 const fs = require('fs');
 const databaseConnection = require('../database/db_connection.js');
 
-const getLoginInfo = (user, cb) => {
-  databaseConnection.query(`SELECT avatar, faccer FROM users WHERE id = ${user};`, (err, res) => {
-    if (err) {
-      cb(err)
-    } else {
-      cb(null, res.rows);
-    }
-  });
-};
-
 const getPosts = (cb) => {
   databaseConnection.query('SELECT users.faccer, users.avatar, posts.post, posts.date FROM users INNER JOIN posts ON users.id = posts.user_id;', (err, res) => {
     if (err) {
@@ -20,7 +10,6 @@ const getPosts = (cb) => {
     }
   });
 };
-
 
 const parseCommentSQL = (data) => {
   let replacement = '<!-- display comments here -->\n<section class = "display-comments">\n';
@@ -42,43 +31,60 @@ const parseCommentSQL = (data) => {
   return replacement;
 };
 
-const parseLoginSQL = (data) => {
-  let replacement = '<!-- logged in header -->\n<header class="header">\n<img src="';
-  replacement += data[0].avatar;
+const addLoginBox = () => {
+  let replacement = '<!-- log in header -->\n';
+    replacement +=' <header class="header">\n';
+    replacement +='   <form id ="login" method="POST" action="/login">\n';
+    replacement +='     <label for="username">Username:</label>\n';
+    replacement +='     <input id="username" name="username" type="text">\n';
+    replacement +='     <label for="password">Password:</label>\n';
+    replacement +='     <input id="password" name="password" type="password">\n';
+    replacement +='     <p class="invisible" id="loginWarning">Don\'t forget to write your login information!</p>\n';
+    replacement +='     <button type="submit" name="submit-login" value="Log In">\n';
+    replacement +='   </form>\n';
+    replacement +=' </header>\n';
+    replacement +='<!-- end of log in header -->';
+
+return replacement;
+}
+
+
+const addUserInfo = (data) => {
+  let replacement = '<!-- log in header -->\n<header class="header">\n<img src="';
+  replacement += data.avatar;
   replacement += '" alt="Avatar"><p>Welcome ';
-  replacement += data[0].faccer;
-  replacement += '</p>\n</header>\n<!-- end of logged in header -->';
+  replacement += data.faccer;
+  replacement += '</p>\n</header>\n<!-- end of log in header -->';
 
   return replacement;
 };
 
-const replaceHTML = (replacement, regex) => {
+const replaceHTML = (replacementLogin, replacementComments) => {
   fs.readFile(__dirname + "/../Public/index.html", 'utf8', (err, data) => {
     if (err) {
       return console.log(err);
     }
 
-    const result = data.replace(regex, replacement);
+    let result = data.replace(/<!-- log in header -->(\n|.)*<!-- end of log in header -->/g, replacementLogin);
+    result = result.replace(/<!-- display comments here -->(\n|.)*<!-- end of comments -->/g, replacementComments);
     console.log(result);
     return result;
   });
 };
 
-const replaceComments = () => {
+
+const updateIndex = (verify, userInfo) => {
   getPosts((error, result) => {
     if (error) return console.log(error);
-    replaceHTML(parseCommentSQL(result), /<!-- display comments here -->(\n|.)*<!-- end of comments -->/g);
+    if (verify === false) {
+      // return replaceHTML(addLoginBox(), parseCommentSQL(result));
+    (replaceHTML(addLoginBox(), parseCommentSQL(result)));
+    } else {
+      return replaceHTML(addUserInfo(userInfo), parseCommentSQL(result));
+    }
   });
 };
 
-const replaceLogin = (user) => {
-  getLoginInfo(user, (error, result) => {
-    if (error) return console.log(error);
-    return replaceHTML(parseLoginSQL(result), /<!-- logged in header -->(\n|.)*<!-- end of logged in header -->/g);
-  });
-};
 
 
-// replaceLogin(1);
-// replaceComments();
-module.exports = { replaceComments, replaceLogin };
+module.exports = {updateIndex, getPosts, replaceHTML, parseCommentSQL, addUserInfo, addLoginBox};
