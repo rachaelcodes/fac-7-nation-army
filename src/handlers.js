@@ -17,20 +17,20 @@ const userDetails = process.env.USERDETAILS;
 const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
 
 const handleHome = (request, response) => {
-  readFile(__dirname + "/../Public/index.html", function(error, file) {
-    if (error) {
-      response.writeHead(500, 'Content-Type:text/html');
-      return response.end('<h1>Sorry, our homepage is sleeping</h1>');
-
-    } else {
-      console.log('hone');
-      response.writeHead(200, {
-        "Content-Type": "text/html"
-      });
-      return response.end(file);
-    }
-  });
-
+  // readFile(__dirname + "/../Public/index.html", function(error, file) {
+  //   if (error) {
+  //     response.writeHead(500, 'Content-Type:text/html');
+  //     return response.end('<h1>Sorry, our homepage is sleeping</h1>');
+  //
+  //   } else {
+  //     console.log('hone');
+  //     response.writeHead(200, {
+  //       "Content-Type": "text/html"
+  //     });
+  //     return response.end(file);
+  //   }
+  // });
+handleAuth(request,response);
 }
 
 const handlePublic = (request, response) => {
@@ -93,25 +93,23 @@ const handleAuth = (request, response) => {
   }
   if (!request.headers.cookie) return sendError();
 
-console.log(parse(request.headers.cookie));
+
   const { jwt } = parse(request.headers.cookie);
 
   if (!jwt) return sendError();
 
   return verify(jwt, SECRET, (err, jwt) => {
     if (err) {
-      return sendError();
+      return 
+      {isVerified: false  }
+
     } else {
-      console.log('jwt is', jwt);
-      const message = `Welcome! Your user ID is: ${jwt.userId}!`
-      response.writeHead(
-        200, {
-          'Content-Type': 'text/plain',
-          'Content-Length': message.length
-        }
-      );
-      return response.end(message)
-    }
+
+      return
+      {isVerified: true,
+        userId: jwt.userId,
+      }
+
   })
 }
 
