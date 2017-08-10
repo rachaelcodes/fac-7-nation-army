@@ -29,6 +29,7 @@ const handlePublic = (request,response) =>{
   fs.readFile(filePath, (error, file) => {
     console.log(filePath);
     if (error) {
+      console.log(error);
       response.writeHead(500, { 'Content-Type': 'text/html' });
       response.end('Sorry, we\'ve had a problem');
     } else {
