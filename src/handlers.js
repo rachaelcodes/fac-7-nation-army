@@ -8,12 +8,12 @@ const {
   sign,
   verify
 } = require('jsonwebtoken');
-
+const bcrypt = require('bcrypt');
 const env = require('env2')('.env');
 const path = require('path');
+const getHashFromDB = require('./password-query');
 
 const SECRET = process.env.SECRET;
-const userDetails = process.env.USERDETAILS;
 const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
 
 const handleHome = (request, response) => {
@@ -61,17 +61,60 @@ const fileName = request.url ;
 }
 
 const handleLogin = (request, response) => {
-
-  const cookie = sign(userDetails, SECRET);
-  console.log('cookie',cookie);
-  response.writeHead(302, {
-    'Location': '/',
-    'Set-Cookie': `jwt=${cookie};HttpOnly`
-  });
-
-response.end();
-  // handleAuth(request, response);
-  console.log('hi2');
+  let body = '';
+    request.on('data', (chunk) => {
+      body += chunk;
+    });
+    request.on('end', () => {
+      // console.log(body);
+      let username = body.split('username=')[1].split('&')[0];
+      const password = body.split('password=')[1].split('&')[0];
+      username = "\'" + username + "\'";
+      bcrypt.hash(password, 10, (err, hashedPw) =>{
+        if (err){
+          console.log('bcrypt.hash err is '+err);
+        }
+        getHashFromDB(username, (err,userDetails)=>{
+          if (err){
+            response.writeHead(302, {
+              'Location': '/'
+            });
+          response.end();
+          }
+          if (userDetails[0]){
+            const dbHash = userDetails[0].password;
+            bcrypt.compare(password,dbHash,(err,pwCheck)=>{
+              if (err){
+                console.log('bcrypt.compare err is '+err);
+              }
+                if (pwCheck) {
+                  const cookiePayload = {};
+                  cookiePayload.id = userDetails[0].id;
+                  cookiePayload.faccer = userDetails[0].faccer;
+                  cookiePayload.avatar = userDetails[0].avatar;
+                  console.log(userDetails);
+                  const cookie = sign(cookiePayload, SECRET);
+                  response.writeHead(302, {
+                    'Location': '/',
+                    'Set-Cookie': `jwt=${cookie};HttpOnly`
+                  });
+                response.end();
+              } else {
+                response.writeHead(302, {
+                  'Location': '/'
+                });
+              response.end();
+              }
+            })
+          } else {
+            response.writeHead(302, {
+              'Location': '/'
+            });
+          response.end();
+          }
+        })
+      })
+    });
 }
 
 const handleLogout = (request, response) => {
@@ -129,6 +172,9 @@ const handlePost = (request, response) => {
 
 }
 
+// bcrypt.hash('test1',10,(err,res)=>{
+//   console.log('hash is-'+res);
+// })
 
 module.exports = {
   handleHome,

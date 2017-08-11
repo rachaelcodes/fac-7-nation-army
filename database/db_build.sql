@@ -17,8 +17,8 @@ CREATE TABLE posts (
 );
 
 INSERT INTO users (faccer,password,avatar) VALUES
-  ('Aisha','test' , 'avatar1.jpg' ) ,
-  ('Yahia', 'test1', 'avatar2.jpg' ) ;
+  ('Aisha','$2a$10$Gt0s4Qg4my9o3edo/60w6OimPO/Sam.lhv/TMPaBgSaD7VVFBgoVC' , 'avatar1.jpg' ) ,
+  ('Yahia', '$2a$10$4pIKv6v7WHwvgCJuSMR7p.AmibYT.jjcZvsZF9bjVMwXmdZZXVWRG', 'avatar2.jpg' ) ;
 
 
 INSERT INTO posts (user_id,post,date) VALUES
