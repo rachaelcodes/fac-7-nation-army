@@ -4,3 +4,34 @@
 .invisible {
   display: none;
 }
+
+body {
+  background-color: white;
+  font-size: 1.5rem;
+  font-family: 'Hammersmith One', sans-serif;
+}
+
+#all-comments{
+  text-align: left;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 50px;
+  float: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  position: relative;
+  margin: 0 0 10px 0;
+  padding: 14px 100px 14px 14px;
+  box-sizing: border-box;
+  align-content: flex-start;
+  line-height: 22px;
+  list-style-type: none;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(44, 62, 80, 0.10);
+  background: #d0d2eb;
+}
+#all-comments img{
+  height :100px;
+  width: 100px;
+}
