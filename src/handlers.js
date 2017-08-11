@@ -19,7 +19,6 @@ const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
 
 
 const handlePublic = (request, response) => {
-
   const fileName = request.url;
   const filePath = path.join(__dirname, '..', 'public', fileName);
   const extension = fileName.split('.')[1];
@@ -28,8 +27,9 @@ const handlePublic = (request, response) => {
     css: 'text/css',
     js: 'application/javascript',
     ico: 'image/x-icon',
-    jpg: 'image/jpeg',
+    jpg: 'image/jpeg'
   };
+  console.log("hit handlePublic for "+ fileName);
   readFile(filePath, (error, file) => {
     if (error) {
       response.writeHead(500, {
