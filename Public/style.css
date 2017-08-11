@@ -18,6 +18,11 @@ body {
   padding: 1%;
 }
 
+.header img{
+  height: 50px;
+  width: 50px;
+}
+
 .post-comment form {
     width: 70vw;
     margin: 5vh auto;
