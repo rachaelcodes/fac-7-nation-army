@@ -11,31 +11,19 @@ const {
 const bcrypt = require('bcrypt');
 const env = require('env2')('.env');
 const path = require('path');
+
+const {updateIndex} = require('./backendHtml.js')
+
 const getHashFromDB = require('./password-query');
+
 
 const SECRET = process.env.SECRET;
 const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
 
-const handleHome = (request, response) => {
-  readFile(__dirname + "/../Public/index.html", function(error, file) {
-    if (error) {
-      response.writeHead(500, 'Content-Type:text/html');
-      return response.end('<h1>Sorry, our homepage is sleeping</h1>');
 
-    } else {
-      console.log('hone');
-      response.writeHead(200, {
-        "Content-Type": "text/html"
-      });
-      return response.end(file);
-    }
-  });
-
-}
 
 const handlePublic = (request, response) => {
-
-const fileName = request.url ;
+  const fileName = request.url;
   const filePath = path.join(__dirname, '..', 'public', fileName);
   const extension = fileName.split('.')[1];
   const extensionType = {
@@ -43,8 +31,9 @@ const fileName = request.url ;
     css: 'text/css',
     js: 'application/javascript',
     ico: 'image/x-icon',
-    jpg: 'image/jpeg',
+    jpg: 'image/jpeg'
   };
+  console.log("hit handlePublic for "+ fileName);
   readFile(filePath, (error, file) => {
     if (error) {
       response.writeHead(500, {
@@ -61,6 +50,14 @@ const fileName = request.url ;
 }
 
 const handleLogin = (request, response) => {
+
+  const cookie = sign(userDetails, SECRET);
+  response.writeHead(302, {
+    'Location': '/',
+    'Set-Cookie': `jwt=${cookie};HttpOnly`
+  });
+
+  response.end();
   let body = '';
     request.on('data', (chunk) => {
       body += chunk;
@@ -125,39 +122,27 @@ const handleLogout = (request, response) => {
   return response.end()
 }
 
-const handleAuth = (request, response) => {
-  const sendError = () => {
-    const message = 'Authenication failed!';
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-      'Content-Length': message.length
+const handleAuth = (request, cb) => {
+
+    if (!request.headers.cookie) return cb  (true, false,{});
+
+    const {
+      jwt
+    } = parse(request.headers.cookie);
+
+    if (!jwt) return   cb  (true, false,{})
+    return verify(jwt, SECRET, (err, jwt) => {
+      if (err) {
+
+        cb  (err, false,{})
+      } else {
+        cb (null, true, {
+          faccer: jwt.faccer,
+          avatar: jwt.avatar
+        })
+      }
     });
-    return response.end(message);
-  }
-  if (!request.headers.cookie) return sendError();
-
-console.log(parse(request.headers.cookie));
-  const { jwt } = parse(request.headers.cookie);
-
-  if (!jwt) return sendError();
-
-  return verify(jwt, SECRET, (err, jwt) => {
-    if (err) {
-      return sendError();
-    } else {
-      console.log('jwt is', jwt);
-      const message = `Welcome! Your user ID is: ${jwt.userId}!`
-      response.writeHead(
-        200, {
-          'Content-Type': 'text/plain',
-          'Content-Length': message.length
-        }
-      );
-      return response.end(message)
-    }
-  })
-}
-
+};
 const handleError = (request, response) => {
   response.writeHead(
     404, {
@@ -172,9 +157,24 @@ const handlePost = (request, response) => {
 
 }
 
-// bcrypt.hash('test1',10,(err,res)=>{
-//   console.log('hash is-'+res);
-// })
+const handleHome = (request, response) => {
+  handleAuth(request, (err,res,obj) => {
+    if (err) {
+      updateIndex(false, obj, (err,res) => {
+
+        response.writeHead(200, 'Content-Type:text/html');
+        response.end(res);
+      })
+    }
+     else {
+      updateIndex(true,obj, (err,res)=>{
+        response.writeHead(200, 'Content-Type:text/html');
+        response.end(res);
+      })
+    }
+  });
+}
+
 
 module.exports = {
   handleHome,
@@ -184,4 +184,4 @@ module.exports = {
   handleAuth,
   handleError,
   handlePost
-}
+};

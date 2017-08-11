@@ -1,6 +1,6 @@
 const http = require('http');
 const handlers = require('./handlers');
-const fileList = ['/index.js', '/style.css', '/favicon.ico']
+const fileList = ['/index.js', '/style.css', '/favicon.ico','/avatar1.jpg','/avatar2.jpg']
 
 const router = (request, response) => {
 
@@ -16,6 +16,7 @@ const router = (request, response) => {
         if (fileList.includes(request.url)) {
           return handlers.handlePublic(request, response);
         } else
+        console.log(request.url);
           return handlers.handleError(request, response);
     }
   }

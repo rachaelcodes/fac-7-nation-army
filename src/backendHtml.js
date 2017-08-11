@@ -1,16 +1,6 @@
 const fs = require('fs');
 const databaseConnection = require('../database/db_connection.js');
 
-const getLoginInfo = (user, cb) => {
-  databaseConnection.query(`SELECT avatar, faccer FROM users WHERE id = ${user};`, (err, res) => {
-    if (err) {
-      cb(err)
-    } else {
-      cb(null, res.rows);
-    }
-  });
-};
-
 const getPosts = (cb) => {
   databaseConnection.query('SELECT users.faccer, users.avatar, posts.post, posts.date FROM users INNER JOIN posts ON users.id = posts.user_id;', (err, res) => {
     if (err) {
@@ -21,8 +11,7 @@ const getPosts = (cb) => {
   });
 };
 
-
-const parseCommentSQL = (data) => {
+const parseCommentSQL = (data, cb) => {
   let replacement = '<!-- display comments here -->\n<section class = "display-comments">\n';
 
   data.forEach((e) => {
@@ -39,46 +28,73 @@ const parseCommentSQL = (data) => {
 
   replacement += '</section>\n<!-- end of comments -->';
 
-  return replacement;
+  cb(null,replacement);
 };
 
-const parseLoginSQL = (data) => {
-  let replacement = '<!-- logged in header -->\n<header class="header">\n<img src="';
-  replacement += data[0].avatar;
+const addLoginBox = (cb) => {
+  let replacement = '<!-- log in header -->\n';
+    replacement +=' <header class="header">\n';
+    replacement +='   <form id ="login" method="POST" action="/login">\n';
+    replacement +='     <label for="username">Username:</label>\n';
+    replacement +='     <input id="username" name="username" type="text">\n';
+    replacement +='     <label for="password">Password:</label>\n';
+    replacement +='     <input id="password" name="password" type="password">\n';
+    replacement +='     <p class="invisible" id="loginWarning">Don\'t forget to write your login information!</p>\n';
+    replacement +='     <button type="submit" name="submit-login" value="Log In">\n';
+    replacement +='   </form>\n';
+    replacement +=' </header>\n';
+    replacement +='<!-- end of log in header -->';
+
+cb(null,replacement);
+}
+
+
+const addUserInfo = (data, cb) => {
+  let replacement = '<!-- log in header -->\n<header class="header">\n<img src="';
+  replacement += data.avatar;
   replacement += '" alt="Avatar"><p>Welcome ';
-  replacement += data[0].faccer;
-  replacement += '</p>\n</header>\n<!-- end of logged in header -->';
+  replacement += data.faccer;
+  replacement += '</p>\n</header>\n<!-- end of log in header -->';
 
-  return replacement;
+  cb(null, replacement);
 };
 
-const replaceHTML = (replacement, regex) => {
+const replaceHTML = (replacementLogin, replacementComments, cb) => {
   fs.readFile(__dirname + "/../Public/index.html", 'utf8', (err, data) => {
     if (err) {
-      return console.log(err);
+      cb(err)
+    } else {
+      let result = data.replace(/<!-- log in header -->(\n|.)*<!-- end of log in header -->/g, replacementLogin);
+      result = result.replace(/<!-- display comments here -->(\n|.)*<!-- end of comments -->/g, replacementComments);
+      cb(null, result);
     }
-
-    const result = data.replace(regex, replacement);
-    console.log(result);
-    return result;
   });
 };
 
-const replaceComments = () => {
+
+const updateIndex = (verify, userInfo, cb) => {
   getPosts((error, result) => {
     if (error) return console.log(error);
-    replaceHTML(parseCommentSQL(result), /<!-- display comments here -->(\n|.)*<!-- end of comments -->/g);
+    if (!verify) {
+    parseCommentSQL(result, (err,responseParsed)=>{
+      addLoginBox((err,responseLogin)=>{
+        replaceHTML(responseLogin, responseParsed, (err,res)=>{
+          cb(null,res);
+        })
+      })
+    })
+    } else {
+      parseCommentSQL(result, (err,responseParsed)=>{
+        addUserInfo(userInfo,(err,responseLogin)=>{
+          replaceHTML(responseLogin, responseParsed, (err,res)=>{
+            cb(null,res);
+          })
+        })
+      })
+    }
   });
 };
 
-const replaceLogin = (user) => {
-  getLoginInfo(user, (error, result) => {
-    if (error) return console.log(error);
-    return replaceHTML(parseLoginSQL(result), /<!-- logged in header -->(\n|.)*<!-- end of logged in header -->/g);
-  });
-};
 
 
-// replaceLogin(1);
-// replaceComments();
-module.exports = { replaceComments, replaceLogin };
+module.exports = {updateIndex, getPosts, replaceHTML, parseCommentSQL, addUserInfo, addLoginBox};
