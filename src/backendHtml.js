@@ -17,11 +17,11 @@ const parseCommentSQL = (data, cb) => {
   data.forEach((e) => {
     replacement += '<button id="all-comments"> \n<span>\n<img src="';
     replacement += e.avatar;
-    replacement += '" alt="User Avatar">\n<p>';
+    replacement += '" alt="User Avatar">\n<p class="all-comments__avatar">';
     replacement += e.faccer;
     replacement += '</p>\n<article>';
     replacement += e.post;
-    replacement += '</article>\n<p>';
+    replacement += '</article>\n<p  class="all-comments__date">';
     replacement += e.date;
     replacement += '\n</p>\n</span>\n</button>\n';
   });
