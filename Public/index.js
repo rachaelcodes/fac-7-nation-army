@@ -44,12 +44,12 @@ loginForm.addEventListener('submit', function(e) {
 
 });
 
-commentForm.addEventListener('submit', function(e) {
-  e.preventDefault();
-  userCheck(commentBox, commentWarning);
-  if(commentBox.value.length>=0){
-    //make a POST API call
-    //we need to define the data we're passing into the request
-    // postRequest(DEFINETHEDATA, '/comment');
-  }
-});
+// commentForm.addEventListener('submit', function(e) {
+//   e.preventDefault();
+//   userCheck(commentBox, commentWarning);
+//   if(commentBox.value.length>=0){
+//     //make a POST API call
+//     //we need to define the data we're passing into the request
+//     // postRequest(DEFINETHEDATA, '/comment');
+//   }
+// });

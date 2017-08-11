@@ -7,12 +7,15 @@ const {
 const {
   sign,
   verify,
+  decode,
 } = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const env = require('env2')('.env');
 const path = require('path');
 const getHashFromDB = require('./password-query');
 const { updateIndex } = require('./backendHtml.js');
+const postData = require('./post.js');
+const querystring = require('querystring');
 
 const SECRET = process.env.SECRET;
 const notFoundPage = '<p style="font-size: 10vh; text-align: center;">404!</p>';
@@ -78,11 +81,10 @@ const handleLogin = (request, response) => {
           });
           response.end();
         }
-        
+
         if (userDetails[0]) {
           const dbHash = userDetails[0].password;
           bcrypt.compare(password, dbHash, (err, pwCheck) => {
-
             if (err) {
               console.log(`bcrypt.compare err is ${err}`);
             }
@@ -174,7 +176,26 @@ const handleHome = (request, response) => {
   });
 };
 const handlePost = (request, response) => {
+  let data = '';
+  request.on('data', (chunk) => {
+    data += chunk;
+  });
+  request.on('end', () => {
+    const postString = data.split('post-comment-new=')[1].split('&submit')[0];
 
+    const cookieInfo = decode(request.headers.cookie.split('jwt=')[1]);
+
+    const userId = cookieInfo.id;
+    const avatar = cookieInfo.avatar;
+    console.log(userId);
+    console.log(avatar);
+    postData(userId, postString, '2017/01/06', (err, res) => {
+      response.writeHead(302, {
+        Location: '/',
+      });
+      return response.end();
+    });
+  });
 };
 
 // bcrypt.hash('test1',10,(err,res)=>{
