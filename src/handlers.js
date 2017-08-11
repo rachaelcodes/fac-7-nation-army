@@ -154,8 +154,7 @@ const handleError = (request, response) => {
       'Content-Type': 'text/html',
       // What does this do?
       'Content-Length': notFoundPage.length,
-    },
-  );
+    });
   return response.end(notFoundPage);
 };
 
