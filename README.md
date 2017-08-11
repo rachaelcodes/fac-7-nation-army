@@ -7,15 +7,15 @@ Ever feel like you're terrible at coding? Or that rookie mistake you just made m
 ## User Stories :snowman: 
 As a FAC'd Upper I can...
 - [x] log into the website (test logins Username: Aisha   Password: password/ Username Yahia    Password: test1)
-- [ ] add my own confession
+- [x] add my own confession
 - [x] view others confessions
 
 ## Requirements :heavy_exclamation_mark: 
 + [x] Login form with 2 fields - username and password
 + [ ] Client-side _and_ server-side validation on login form, including error handling that provides feedback to users
 + [x] Users only have to log in once (i.e. implement a cookie-based session on login)
-+ [ ] Username is visible on each page of the site after logging in
-+ [ ] Any user-submitted content should be labelled with the authors username
++ [x] Username is visible on each page of the site after logging in
++ [x] Any user-submitted content should be labelled with the authors username
 + [ ] There should be protected routes and unprotected routes that depend on the user having a cookie or not (or what level of access they have).
 + [x] Website content should be stored in a database
 
