@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" type="text/css" href="./style.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Saira|Roboto" rel="stylesheet">
   <title>FAC'd Up</title>
 </head>
 <body>
@@ -14,10 +15,12 @@
 
   <section class="post-comment">
     <form id ="post-comment" method="POST" action="/post-comment">
-    <label for="comment">I FAC'd up by...</label>
-    <input id="comment" name="post-comment-new" type="text">
+
+    <label for="post-comment-new">I FAC'd up by...</label>
+    <input class="post-comment__input" id="comment" name="post-comment-new" type="text">
     <p class="invisible" id="commentWarning">Don't forget to write a comment!</p>
-      <button type="submit" name="submit-comment" value="Post-comment" >Submit</button>
+    <input class="post-comment__submit" type="submit">
+
     </form>
   </section>
   <!-- display comments here -->
