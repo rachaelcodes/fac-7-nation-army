@@ -53,8 +53,11 @@ body {
 }
 
 .post-comment__submit{
+  display: block;
   box-sizing: border-box;
-  margin: auto;
+  border: 2px darkslategrey solid;
+  border-radius: 5px;
+  margin:5px auto;
   width: 50%;
 }
 
